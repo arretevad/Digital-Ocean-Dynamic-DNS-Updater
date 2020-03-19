@@ -199,8 +199,8 @@ def parse_args():
     parser.add_argument("--ip", type=str, help='data field for the record such as ipv4 address, defaults to external ip if not set or local ip if --local given')
     parser.add_argument("--ttl", default='60', type=str)
     parser.add_argument("-q", "--quiet", action="store_true", help='Only display output on IP change')
+    parser.add_argument("--run-every", default=0, type=int, help='Cron mode, repeate every X seconds')
     return parser.parse_args()
-
 
 def script_name() -> str:
     """:returns: script name with leading paths removed"""
@@ -208,7 +208,6 @@ def script_name() -> str:
 
 
 def config_logging():
-    import time
     logging.getLogger().setLevel(logging.INFO)
     logging.getLogger("requests").setLevel(logging.WARNING)
     logging.basicConfig(format='{}: %(asctime)sZ %(levelname)s %(message)s'.format(script_name()))
@@ -222,6 +221,20 @@ def main():
         if args.quiet:
             logging.disable(logging.INFO)
 
+        while(True):
+            result = run_main(args)
+            if args.run_every:
+                time.sleep(args.run_every)
+            else:
+                return result
+
+    except Exception as e:
+        logging.exception(e)
+        return 1
+
+
+def run_main(args):
+    try: 
         if args.ip:
             ipaddr = args.ip
         elif args.local:
