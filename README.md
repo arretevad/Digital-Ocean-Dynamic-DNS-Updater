@@ -60,11 +60,12 @@ This mode is perfect if you want to run inside a Docker container, where there i
     RECORD={your record}
     RTYPE=A
     TIMEOUT=60
-    ARGS="$TOKEN $DOMAIN $RECORD $RTYPE --run-every $TIMEOUT"
+    ARGS="-t $TOKEN --rtype $RTYPE $RECORD $DOMAIN --run-every $TIMEOUT"
 
     docker run \
       -it \
       --rm \
+      -d \
       --name do-ddns-updater \
       -v "$PWD":/usr/src/app \
       -w /usr/src/app \
